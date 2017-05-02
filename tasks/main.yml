@@ -1,0 +1,86 @@
+---
+- name: Make sure that the traefik directory exists
+  file:
+    path: "{{ traefik_dir }}"
+    state: directory
+    mode: "0744"
+
+- name: Copy traefik config
+  template:
+    dest: "{{ traefik_dir }}/traefik.toml"
+    src: templates/traefik.toml.j2
+
+- name: Copy acme.json
+  copy:
+    dest: "{{ traefik_dir }}/acme.json"
+    force: no
+    mode: 0600
+    src: files/acme.json
+
+- name: Create network
+  docker_network:
+    driver: bridge
+    name: "{{ network }}"
+
+- name: Run traefik proxy
+  docker_container:
+    image: traefik:latest
+    name: traefik
+    networks:
+      - name: "{{ network }}"
+    pull: true
+    ports:
+      - 443:443
+      - 80:80
+      - 8080:8080
+    recreate: true
+    restart_policy: always
+    state: started
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml"
+      - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
+
+- name: Run mailhog mail server
+  docker_container:
+    image: mailhog/mailhog
+    labels:
+      traefik.backend: mailhog
+      traefik.frontend.rule: "Host:{{ mailhog_hostname }}"
+      traefik.port: "8025"
+    name: mailhog
+    networks:
+      - name: "{{ network }}"
+    ports:
+      - 1025:1025
+      - 8025:8025
+    recreate: true
+    restart_policy: always
+    state: started
+
+- name: Run docker-cleanup
+  docker_container:
+    image: meltwater/docker-cleanup:latest
+    labels:
+      traefik.enable: "false"
+    name: janitor
+    networks:
+      - name: "{{ network }}"
+    recreate: true
+    restart_policy: always
+    state: started
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /var/lib/docker:/var/lib/docker:rw
+
+- name: Run PhantomJS
+  docker_container:
+    image: wernight/phantomjs:latest
+    labels:
+      traefik.enable: "false"
+    name: phantomjs
+    networks:
+      - name: "{{ network }}"
+    recreate: true
+    restart_policy: always
+    state: started
