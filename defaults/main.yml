@@ -1,1 +1,3 @@
 traefik_dir: /etc/traefik
+traefik_log_level: DEBUG
+traefik_debug: true

@@ -1,5 +1,7 @@
-defaultEntryPoints = ["http", "https"]
 logLevel = "{{ traefik_log_level }}"
+debug = {{ traefik_debug | lower }}
+
+defaultEntryPoints = ["http", "https"]
 
 [entryPoints]
 [entryPoints.http]
@@ -22,7 +24,7 @@ onDemand = true
 {% for domain in acme_domains %}
 [[acme.domains]]
 main = "{{ domain.domain }}"
-sans = [{% for san in domain.sans %}{{ san }}{% if not loop.last %}, {% endif %}{% endfor %}]
+sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endfor %}
 
 [web]
