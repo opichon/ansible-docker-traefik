@@ -1,28 +1,39 @@
 ---
 - name: Make sure that the traefik directory exists
+  become: true
   file:
+    mode: "0744"
+    group: "{{ docker_group }}"
+    owner: "{{ docker_user }}"
     path: "{{ traefik_dir }}"
     state: directory
-    mode: "0744"
 
 - name: Copy traefik config
   template:
     dest: "{{ traefik_dir }}/traefik.toml"
+    group: "{{ docker_group }}"
+    owner: "{{ docker_user }}"
     src: templates/traefik.toml.j2
 
 - name: Copy acme.json
   copy:
     dest: "{{ traefik_dir }}/acme.json"
     force: no
+    group: "{{ docker_group }}"
     mode: 0600
+    owner: "{{ docker_user }}"
     src: files/acme.json
 
 - name: Create network
+  become: yes
+  become_user: "{{ docker_user }}"
   docker_network:
     driver: bridge
     name: "{{ network }}"
 
 - name: Run traefik proxy
+  become: yes
+  become_user: "{{ docker_user }}"
   docker_container:
     image: traefik:latest
     name: traefik
@@ -35,13 +46,15 @@
       - 8080:8080
     recreate: true
     restart_policy: always
-    state: started
+    state: "{{ state }}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml"
       - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
 
 - name: Run mailhog mail server
+  become: yes
+  become_user: "{{ docker_user }}"
   docker_container:
     image: mailhog/mailhog
     labels:
@@ -56,10 +69,12 @@
       - 8025:8025
     recreate: true
     restart_policy: always
-    state: started
+    state: "{{ state }}"
   when: mailhog
 
 - name: Run docker-cleanup
+  become: yes
+  become_user: "{{ docker_user }}"
   docker_container:
     image: meltwater/docker-cleanup:latest
     labels:
@@ -69,12 +84,14 @@
       - name: "{{ network }}"
     recreate: true
     restart_policy: always
-    state: started
+    state: "{{ state }}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
       - /var/lib/docker:/var/lib/docker:rw
 
 - name: Run PhantomJS
+  become: yes
+  become_user: "{{ docker_user }}"
   docker_container:
     image: wernight/phantomjs:latest
     labels:
@@ -84,5 +101,5 @@
       - name: "{{ network }}"
     recreate: true
     restart_policy: always
-    state: started
+    state: "{{ state }}"
   when: phantomjs
