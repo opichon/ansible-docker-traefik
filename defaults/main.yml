@@ -1,3 +1,8 @@
+mailhog: yes
+
+phantomjs: yes
+
+traefik: yes
 traefik_dir: /etc/traefik
 traefik_log_level: DEBUG
 traefik_debug: true

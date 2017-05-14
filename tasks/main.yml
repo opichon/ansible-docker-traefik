@@ -57,6 +57,7 @@
     recreate: true
     restart_policy: always
     state: started
+  when: mailhog
 
 - name: Run docker-cleanup
   docker_container:
@@ -84,3 +85,4 @@
     recreate: true
     restart_policy: always
     state: started
+  when: phantomjs
