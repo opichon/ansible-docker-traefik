@@ -1,0 +1,106 @@
+---
+- name: Make sure that the traefik directory exists
+  become: true
+  file:
+    group: "{{ traefik_group }}"
+    owner: "{{ traefik_user }}"
+    path: "{{ traefik_dir }}"
+    state: directory
+    mode: "0744"
+
+- name: Copy traefik config
+  become: yes
+  become_user: "{{ traefik_user }}"
+  template:
+    dest: "{{ traefik_dir }}/traefik.toml"
+    src: templates/traefik.toml.j2
+
+- name: Copy acme.json
+  become: yes
+  become_user: "{{ traefik_user }}"
+  copy:
+    dest: "{{ traefik_dir }}/acme.json"
+    force: no
+    mode: 0600
+    src: files/acme.json
+
+- name: Create network
+  become: yes
+  become_user: "{{ traefik_user }}"
+  docker_network:
+    driver: bridge
+    name: "{{ traefik_network }}"
+
+- name: Run traefik proxy
+  become: yes
+  become_user: "{{ traefik_user }}"
+  docker_container:
+    image: traefik:latest
+    name: traefik
+    networks:
+      - name: "{{ traefik_network }}"
+    pull: true
+    ports:
+      - 443:443
+      - 80:80
+      - 8080:8080
+    recreate: true
+    restart_policy: always
+    state: started
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml"
+      - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
+
+- name: Run mailhog mail server
+  become: yes
+  become_user: "{{ traefik_user }}"
+  docker_container:
+    image: mailhog/mailhog
+    labels:
+      traefik.backend: mailhog
+      traefik.frontend.rule: "Host:{{ traefik_mailhog_hostname }}"
+      traefik.port: "8025"
+    name: mailhog
+    networks:
+      - name: "{{ traefik_network }}"
+    ports:
+      - 1025:1025
+      - 8025:8025
+    recreate: true
+    restart_policy: always
+    state: started
+  when: traefik_mailhog
+
+- name: Run docker-cleanup
+  become: yes
+  become_user: "{{ traefik_user }}"
+  docker_container:
+    image: meltwater/docker-cleanup:latest
+    labels:
+      traefik.enable: "false"
+    name: janitor
+    networks:
+      - name: "{{ traefik_network }}"
+    recreate: true
+    restart_policy: always
+    state: started
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /var/lib/docker:/var/lib/docker:rw
+  when: traefik_janitor
+
+- name: Run PhantomJS
+  become: yes
+  become_user: "{{ traefik_user }}"
+  docker_container:
+    image: wernight/phantomjs:latest
+    labels:
+      traefik.enable: "false"
+    name: phantomjs
+    networks:
+      - name: "{{ traefik_network }}"
+    recreate: true
+    restart_policy: always
+    state: started
+  when: traefik_phantomjs

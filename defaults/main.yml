@@ -1,0 +1,11 @@
+traefik_janitor: yes
+traefik_mailhog: yes
+traefik_mailhog_hostname: mailhog
+traefik_phantomjs: yes
+
+traefik_debug: true
+traefik_dir: /etc/traefik
+traefik_group: root
+traefik_log_level: DEBUG
+traefik_network: traefik
+traefik_user: root

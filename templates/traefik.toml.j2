@@ -1,0 +1,39 @@
+logLevel = "{{ traefik_log_level }}"
+debug = {{ traefik_debug | lower }}
+
+defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+[entryPoints.http]
+address = ":80"
+[entryPoints.http.redirect]
+entryPoint = "https"
+
+[entryPoints.https]
+address = ":443"
+[entryPoints.https.tls]
+
+exposedbydefault = false
+
+[acme]
+email = "{{ acme_email }}"
+storageFile = "/etc/traefik/acme.json"
+entryPoint =  "https"
+onDemand = true
+
+{% for domain in acme_domains %}
+[[acme.domains]]
+main = "{{ domain.domain }}"
+sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endfor %}
+
+[web]
+address = ":8080"
+
+[web.auth.basic]
+users = ["test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/", "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"]
+
+[docker]
+domain = "{{ traefik_docker_domain }}"
+endpoint = "unix:///var/run/docker.sock"
+watch = true
