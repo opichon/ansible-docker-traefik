@@ -1,6 +1,6 @@
 galaxy_info:
   author: Olivier Pichon <op@united-asian.com>
-  description: Install tarefik and other common services as docker containers
+  description: Installs traefik proxy and other useful services as docker containers
   company: United Asian Management Limited
 
   license: license (MIT)
