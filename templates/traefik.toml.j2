@@ -24,8 +24,11 @@ onDemand = true
 {% for domain in acme_domains %}
 [[acme.domains]]
 main = "{{ domain.domain }}"
+{% if domain.sans is defined and domain.sans | length %}
 sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}
 {% endfor %}
+
 
 [web]
 address = ":8080"
