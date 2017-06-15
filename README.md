@@ -11,6 +11,7 @@ This role requires Ansible 1.2 or higher.
 Ansible variables are listed below with their default values.
 
 ```
+traefik_certificates: []
 traefik_docker_domain
 traefik_group: root
 traefik_dir: /etc/traefik
@@ -32,6 +33,12 @@ acme_domains:
 - hosts: webservers
   roles:
     - opichon.docker-traefik
+      traefik_certificates:
+      -
+      	{
+      		CertFile: "/path/to/certificate.crt",
+      		KeyFile: "/path/tto/keyfile.key"
+      	}
       traefik_docker_domain: mydomain.com
       traefik_network: mydomain
       traefik_volumes:
