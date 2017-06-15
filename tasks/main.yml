@@ -41,9 +41,5 @@
       - 8080:8080
     recreate: true
     restart_policy: always
-    state: started
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml"
-      - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
-      - /polifonic/ssl:/polifonic/ssl
+    state: "{{ traefik_state }}"
+    volumes: '[ "/var/run/docker.sock:/var/run/docker.sock", "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml", "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json" ] + {{ traefik_volumes }}'
