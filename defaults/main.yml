@@ -1,6 +1,6 @@
-traefik_debug: true
+traefik_debug: false
 traefik_dir: /etc/traefik
-traefik_group: root
-traefik_log_level: DEBUG
+traefik_group: www-data
+traefik_log_level: ERROR
 traefik_network: traefik
-traefik_user: root
+traefik_user: www-data

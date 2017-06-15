@@ -12,6 +12,11 @@ entryPoint = "https"
 [entryPoints.https]
 address = ":443"
 [entryPoints.https.tls]
+{% for cert in traefik_certificates %}
+[[entryPoints.https.tls.certificates]]
+CertFile = "{{ cert.CertFile }}"
+KeyFile = "{{ cert.KeyFile }}"
+{% endfor %}
 
 exposedbydefault = false
 

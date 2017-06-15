@@ -9,33 +9,28 @@
     mode: "0744"
 
 - name: Copy traefik config
-  become: yes
-  become_user: "{{ traefik_user }}"
   template:
     dest: "{{ traefik_dir }}/traefik.toml"
+    force: true
     src: templates/traefik.toml.j2
 
 - name: Copy acme.json
-  become: yes
-  become_user: "{{ traefik_user }}"
   copy:
     dest: "{{ traefik_dir }}/acme.json"
-    force: no
+    force: false
     mode: 0600
     src: files/acme.json
 
 - name: Create network
-  become: yes
-  become_user: "{{ traefik_user }}"
   docker_network:
     driver: bridge
     name: "{{ traefik_network }}"
 
 - name: Run traefik proxy
-  become: yes
-  become_user: "{{ traefik_user }}"
   docker_container:
     image: traefik:latest
+    labels:
+      traefik.enabled: "false"
     name: traefik
     networks:
       - name: "{{ traefik_network }}"
@@ -51,3 +46,4 @@
       - /var/run/docker.sock:/var/run/docker.sock
       - "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml"
       - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
+      - /polifonic/ssl:/polifonic/ssl
