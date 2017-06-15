@@ -16,6 +16,8 @@ traefik_group: root
 traefik_dir: /etc/traefik
 traefik_network: traefik
 traefik_user: root
+traefik_volumes:
+  - /etc/ssl:/etc/ssl
 
 acme_email: "me@google.com"
 acme_domains:
