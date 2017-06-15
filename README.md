@@ -31,7 +31,11 @@ acme_domains:
 ---
 - hosts: webservers
   roles:
-  	- opichon.docker-services
+  	- opichon.docker-traefik
+  		traefik_docker_domain: mydomain.com
+  		traefik_network: mydomain
+			traefik_volumes:
+  		- /etc/ssl:/etc/ssl
 ```
 
 ## License
