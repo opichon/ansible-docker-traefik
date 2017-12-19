@@ -25,6 +25,7 @@ email = "{{ acme_email }}"
 storageFile = "/etc/traefik/acme.json"
 entryPoint =  "https"
 onDemand = true
+onHostRule = true
 
 {% for domain in acme_domains %}
 [[acme.domains]]
@@ -34,12 +35,11 @@ sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif 
 {% endif %}
 {% endfor %}
 
-
 [web]
 address = ":8080"
 
 [web.auth.basic]
-users = ["test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/", "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"]
+users = [{% for user in traefik_web_users %}"{{ user.name }}: {{ user.password }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 
 [docker]
 domain = "{{ traefik_docker_domain }}"
