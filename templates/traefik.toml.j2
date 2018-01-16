@@ -53,10 +53,10 @@ sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif 
 address = ":{{ traefik_web_port }}"
 
 [web.auth.basic]
-users = {{ traefik_web_auth_basic }}
+users = "{{ traefik_web_auth_basic }}"
 
 [web.auth.digest]
-users = {{ traefik_web_auth_digest }}
+users = "{{ traefik_web_auth_digest }}"
 {% endif %}
 
 [docker]
