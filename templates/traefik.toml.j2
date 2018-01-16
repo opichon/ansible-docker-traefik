@@ -6,7 +6,8 @@ defaultEntryPoints = ["http", "https"]
 [entryPoints]
 [entryPoints.http]
 address = ":80"
-{% if traefik_https  and traefik_https_redirect %}
+
+{% if traefik_https and traefik_https_redirect %}
 [entryPoints.http.redirect]
 entryPoint = "https"
 {% endif %}
@@ -53,7 +54,6 @@ address = ":{{ traefik_web_port }}"
 
 [web.auth.basic]
 users = {{ traefik_web_auth_basic }}
-{% endif %}
 
 [web.auth.digest]
 users = {{ traefik_web_auth_digest }}
