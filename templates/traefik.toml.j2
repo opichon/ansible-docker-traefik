@@ -6,9 +6,12 @@ defaultEntryPoints = ["http", "https"]
 [entryPoints]
 [entryPoints.http]
 address = ":80"
+{% if traefik_https  and traefik_https_redirect %}
 [entryPoints.http.redirect]
 entryPoint = "https"
+{% endif %}
 
+{% if traefik_https %}
 [entryPoints.https]
 address = ":443"
 [entryPoints.https.tls]
@@ -17,15 +20,23 @@ address = ":443"
 CertFile = "{{ cert.CertFile }}"
 KeyFile = "{{ cert.KeyFile }}"
 {% endfor %}
+{% endif %}
 
 exposedbydefault = false
 
+{% if traefik_https %}
 [acme]
 email = "{{ acme_email }}"
 storageFile = "/etc/traefik/acme.json"
 entryPoint =  "https"
-onDemand = true
-onHostRule = true
+
+{% if traefik_ondemand %}
+onDemand = "{{ traefik_ondemand }}"
+{% endif %}
+
+{% if traefik_onhostrule %}
+onHostRule = "{{ traefik_onhostrule }}"
+{% endif %}
 
 {% for domain in acme_domains %}
 [[acme.domains]]
@@ -34,12 +45,19 @@ main = "{{ domain.domain }}"
 sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endif %}
 {% endfor %}
+{% endif %}
 
+{% if traefik_web %}
 [web]
-address = ":8080"
+address = ":{% traefik_web_port %}"
 
 [web.auth.basic]
-users = [{% for user in traefik_web_users %}"{{ user.name }}: {{ user.password }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+users = {{ traefik_web_auth_basic }} %}]
+{% endif %}
+
+[web.auth.digest]
+users = {{ traefik_web_auth_digest }}
+{% endif %}
 
 [docker]
 domain = "{{ traefik_docker_domain }}"
