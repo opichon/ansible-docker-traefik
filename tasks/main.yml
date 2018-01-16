@@ -33,7 +33,7 @@
       traefik.frontend.rule: "Host:{{ traefik_hostname }}"
       traefik.port: "8080"
       traefik.priority: "1"
-    image: traefik:latest
+    image: traefik:1.5.0-rc5
     name: traefik
     networks:
       - name: "{{ traefik_network }}"

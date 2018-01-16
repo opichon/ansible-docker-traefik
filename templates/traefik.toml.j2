@@ -27,17 +27,18 @@ exposedbydefault = false
 
 {% if traefik_https %}
 [acme]
+
 email = "{{ acme_email }}"
 storageFile = "/etc/traefik/acme.json"
-entryPoint =  "https"
-
-{% if traefik_ondemand %}
-onDemand = "{{ traefik_ondemand }}"
-{% endif %}
 
 {% if traefik_onhostrule %}
-onHostRule = "{{ traefik_onhostrule }}"
+onHostRule = true
 {% endif %}
+
+entryPoint = "https"
+
+[acme.httpChallenge]
+entryPoint = "http"
 
 {% for domain in acme_domains %}
 [[acme.domains]]
