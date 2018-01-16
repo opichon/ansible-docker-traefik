@@ -30,7 +30,7 @@
   docker_container:
     labels:
       traefik.backend: traefik
-      traefik.frontend.rule: "Host: traefik.{{ traefik_docker_domain }}"
+      traefik.frontend.rule: "Host:{{ traefik_hostname }}"
       traefik.port: "8080"
       traefik.priority: "1"
     image: traefik:latest
