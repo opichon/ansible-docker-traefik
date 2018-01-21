@@ -31,6 +31,10 @@ exposedbydefault = false
 email = "{{ acme_email }}"
 storageFile = "/etc/traefik/acme.json"
 
+{% if traefik_ondemand %}
+onDemand = true
+{% endif %}
+
 {% if traefik_onhostrule %}
 onHostRule = true
 {% endif %}
