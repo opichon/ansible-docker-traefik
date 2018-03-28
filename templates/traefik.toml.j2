@@ -29,11 +29,7 @@ exposedbydefault = false
 [acme]
 
 email = "{{ acme_email }}"
-storageFile = "/etc/traefik/acme.json"
-
-{% if traefik_ondemand %}
-onDemand = true
-{% endif %}
+storage = "/etc/traefik/acme.json"
 
 {% if traefik_onhostrule %}
 onHostRule = true
@@ -51,19 +47,6 @@ main = "{{ domain.domain }}"
 sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endif %}
 {% endfor %}
-{% endif %}
-
-{% if traefik_web %}
-[web]
-address = ":{{ traefik_web_port }}"
-
-{% if traefik_web_auth == 'basic' %}
-[web.auth.basic]
-{% elif traefik_web_auth == 'digest' %}
-[web.auth.digest]
-{% endif %}
-
-users = [{% for user in traefik_web_auth_users %}"{{ user }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endif %}
 
 [docker]

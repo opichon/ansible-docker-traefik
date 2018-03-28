@@ -5,7 +5,7 @@ traefik_group: www-data
 traefik_hostname: "traefik.{{ traefik_docker_domain }}"
 traefik_https: true
 traefik_https_redirect: true
-traefik_image: latest
+traefik_image: traefik:1.6
 traefik_log_level: ERROR
 traefik_network: traefik
 traefik_onhostrule: true
