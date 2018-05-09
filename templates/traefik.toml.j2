@@ -53,3 +53,9 @@ sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif 
 domain = "{{ traefik_docker_domain }}"
 endpoint = "unix:///var/run/docker.sock"
 watch = true
+
+[traefikLog]
+filePath = "/var/log/traefik/traefik.log"
+
+[accessLog]
+filepath = "/var/log/traefik/access.log"

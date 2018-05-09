@@ -7,12 +7,12 @@ traefik_https: true
 traefik_https_redirect: true
 traefik_image: traefik:1.6
 traefik_log_level: ERROR
-traefik_network: traefik
+traefik_networks: [
+  name: traefik
+]
 traefik_onhostrule: true
 traefik_state: started
 traefik_user: www-data
-traefik_volumes: []
-traefik_web: true
-traefik_web_port: 8080
-traefik_web_auth: basic
-traefik_web_auth_users: []
+traefik_volumes: [
+  "{{ traefik_dir}}/logs:/var/log/traefik"
+]

@@ -28,15 +28,9 @@
 
 - name: Run traefik proxy
   docker_container:
-    labels:
-      traefik.backend: traefik
-      traefik.frontend.rule: "Host:{{ traefik_hostname }}"
-      traefik.port: "8080"
-      traefik.priority: "1"
     image: "{{ traefik_image }}"
     name: traefik
-    networks:
-      - name: "{{ traefik_network }}"
+    networks: "{{ traefik_networks }}"
     pull: true
     ports:
       - "443:443"
