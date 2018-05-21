@@ -1,3 +1,6 @@
+traefik_auth_users:
+  - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+  - "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
 traefik_certificates: []
 traefik_debug: false
 traefik_dir: /etc/traefik
