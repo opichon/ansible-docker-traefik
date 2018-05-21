@@ -23,6 +23,14 @@ KeyFile = "{{ cert.KeyFile }}"
 {% endfor %}
 {% endif %}
 
+[entryPoints.traefik]
+address = ":8080"
+{% if traefik_auth_users | length %}
+[entryPoints.foo.auth]
+[entryPoints.traefik.auth.basic]
+  users = [{% for user in traefik_auth_users %}"{{ user }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}
+
 exposedbydefault = false
 
 {% if traefik_https %}
@@ -61,5 +69,5 @@ filePath = "/var/log/traefik/traefik.log"
 filepath = "/var/log/traefik/access.log"
 
 [api]
-  entryPoint = "traefik"
-  dashboard = true
+entryPoint = "traefik"
+dashboard = true
