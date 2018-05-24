@@ -26,7 +26,7 @@ KeyFile = "{{ cert.KeyFile }}"
 [entryPoints.traefik]
 address = ":8080"
 {% if traefik_auth_users | length %}
-[entryPoints.foo.auth]
+[entryPoints.traefik.auth]
 [entryPoints.traefik.auth.basic]
 users = [{% for user in traefik_auth_users %}"{{ user }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endif %}
