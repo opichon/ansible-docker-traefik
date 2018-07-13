@@ -1,9 +1,10 @@
 galaxy_info:
+  role_name: docker-traefik
   author: Olivier Pichon <op@united-asian.com>
   description: Installs traefik proxy and other useful services as docker containers
   company: United Asian Management Limited
 
-  license: license (MIT)
+  license: MIT
 
   min_ansible_version: 1.2
 
