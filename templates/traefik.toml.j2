@@ -25,19 +25,17 @@ KeyFile = "{{ cert.KeyFile }}"
 
 [entryPoints.traefik]
 address = ":8080"
-{% if traefik_auth_users | length %}
+{% if traefik_users_basic_auth | length %}
 [entryPoints.traefik.auth]
 [entryPoints.traefik.auth.basic]
-users = [{% for user in traefik_auth_users %}"{{ user }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+users = [{% for user in traefik_users_basic_auth %}"{{ user }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endif %}
-
-exposedbydefault = false
 
 {% if traefik_https %}
 [acme]
 
 email = "{{ acme_email }}"
-storage = "/etc/traefik/acme.json"
+storage = "{{ acme_storage }}"
 
 {% if traefik_onhostrule %}
 onHostRule = true
@@ -60,6 +58,7 @@ sans = [{% for san in domain.sans %}"{{ san }}"{% if not loop.last %}, {% endif 
 [docker]
 domain = "{{ traefik_docker_domain }}"
 endpoint = "unix:///var/run/docker.sock"
+exposedByDefault = false
 watch = true
 
 [traefikLog]

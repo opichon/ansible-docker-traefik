@@ -1,3 +1,5 @@
+acme_storage: "/etc/traefik/acme.json"
+
 traefik_auth_users: []
 traefik_certificates: []
 traefik_debug: false
@@ -6,7 +8,7 @@ traefik_group: www-data
 traefik_hostname: "traefik.{{ traefik_docker_domain }}"
 traefik_https: true
 traefik_https_redirect: true
-traefik_image: traefik:1.6
+traefik_image: traefik:1.7
 traefik_log_level: ERROR
 traefik_networks:
   - traefik
