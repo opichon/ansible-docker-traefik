@@ -1,8 +1,8 @@
 galaxy_info:
   role_name: docker-traefik
-  author: Olivier Pichon <op@united-asian.com>
+  author: Olivier Pichon <op@dzaango.com>
   description: Installs traefik proxy and other useful services as docker containers
-  company: United Asian Management Limited
+  company: Dzango Technologies Limited
 
   license: MIT
 

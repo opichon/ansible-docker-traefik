@@ -32,7 +32,7 @@ acme_domains:
 ---
 - hosts: webservers
   roles:
-    - opichon.docker-traefik
+    - dzangolab.docker_traefik
       traefik_certificates:
       -
       	{
