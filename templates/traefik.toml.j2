@@ -34,6 +34,14 @@ users = [{% for user in traefik_users_basic_auth %}"{{ user }}"{% if not loop.la
 {% if traefik_https %}
 [acme]
 
+{% if acme_staging %}
+caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+{% endif %}
+
+{% if acme_logging %}
+acmeLogging = true
+{% endif %}
+
 email = "{{ acme_email }}"
 storage = "{{ acme_storage }}"
 

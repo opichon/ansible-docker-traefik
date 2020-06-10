@@ -1,3 +1,5 @@
+acme_logging: true
+acme_staging: false
 acme_storage: "/etc/traefik/acme.json"
 
 traefik_auth_users: []

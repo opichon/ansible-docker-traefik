@@ -24,6 +24,8 @@ acme_domains:
   - domain: mydomain.com
     sans:
       - www.mydomain.com
+acme_logging: true
+acme_staging: false
 ```
 
 ## Example playbook
