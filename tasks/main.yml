@@ -28,6 +28,7 @@
       traefik.backend: traefik
       traefik.frontend.rule: "Host:{{ traefik_hostname }}"
       traefik.port: "8080"
+      traefik.enable: "true"
     name: traefik
     pull: true
     ports:
