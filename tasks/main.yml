@@ -6,7 +6,10 @@
     owner: "{{ traefik_user }}"
     path: "{{ traefik_dir }}"
     state: directory
-    mode: "0744"
+    mode: "0755"
+  with_items:
+    - "{{ traefik_dir }}"
+    - "{{ traefik_log_dir }}"
 
 - name: Copy traefik config
   template:
