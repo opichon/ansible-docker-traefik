@@ -24,6 +24,13 @@
     mode: 0600
     src: files/acme.json
 
+- name: Create network
+  docker_network:
+    driver: bridge
+    name: "{{ item }}"
+  with_items: "{{ traefik_network }}"
+  ignore_errors: yes
+
 - name: Run traefik proxy
   docker_container:
     image: "{{ traefik_image }}"
@@ -42,11 +49,5 @@
     restart_policy: always
     state: "{{ traefik_state }}"
     volumes: '[ "/var/run/docker.sock:/var/run/docker.sock", "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml", "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json" ] + {{ traefik_volumes }}'
-
-- name: Create network
-  docker_network:
-    driver: bridge
-    name: "{{ item }}"
-    connected: traefik
-  with_items: "{{ traefik_networks }}"
-  ignore_errors: yes
+    networks:
+      - name: "{{ traefik_network }}"
