@@ -1,53 +1,33 @@
 ---
-- name: Make sure that the traefik directory exists
+- name: Ensure traefik data directory exist
   become: true
   file:
     group: "{{ traefik_group }}"
     owner: "{{ traefik_user }}"
-    path: "{{ traefik_dir }}"
+    path: "{{ item }}"
     state: directory
-    mode: "0755"
+    recurse: yes
   with_items:
     - "{{ traefik_dir }}"
+    - "{{ traefik_acme_dir }}"
     - "{{ traefik_log_dir }}"
 
-- name: Copy traefik config
+- name: Copy files
+  become: true
   template:
-    dest: "{{ traefik_dir }}/traefik.toml"
-    force: true
-    src: templates/traefik.toml.j2
+    dest: "{{ traefik_dir }}/traefik.yml"
+    group: "{{ traefik_group }}"
+    owner: "{{ traefik_user }}"
+    src: "templates/traefik.yml.j2"
 
-- name: Copy acme.json
-  copy:
-    dest: "{{ traefik_dir }}/acme.json"
-    force: false
-    mode: 0600
-    src: files/acme.json
+- name: Start traefik
+  command: docker-compose -f traefik.yml up -d
+  args:
+    chdir: "{{ traefik_dir }}"
+  when: traefik_state == "started"
 
-- name: Create network
-  docker_network:
-    driver: bridge
-    name: "{{ item }}"
-  with_items: "{{ traefik_network }}"
-  ignore_errors: yes
-
-- name: Run traefik proxy
-  docker_container:
-    image: "{{ traefik_image }}"
-    labels:
-      traefik.backend: traefik
-      traefik.frontend.rule: "Host:{{ traefik_hostname }}"
-      traefik.port: "8080"
-      traefik.enable: "true"
-    name: traefik
-    pull: true
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    recreate: true
-    restart_policy: always
-    state: "{{ traefik_state }}"
-    volumes: '[ "/var/run/docker.sock:/var/run/docker.sock", "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml", "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json" ] + {{ traefik_volumes }}'
-    networks:
-      - name: "{{ traefik_network }}"
+- name: Stop traefik
+  command: docker-compose -f traefik.yml down
+  args:
+    chdir: "{{ traefik_dir }}"
+  when: traefik_state == "stopped"

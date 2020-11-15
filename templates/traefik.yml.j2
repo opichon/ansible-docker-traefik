@@ -1,0 +1,42 @@
+version: "3.7"
+
+networks:
+  {{ traefik_network }}:
+    external: true
+    
+services:
+  traefik:
+    container_name: "{{ traefik_contaioner_name }}"
+    image: "{{ traefik_image }}"
+    command:
+      - "--log.level={{ trafik_log_level }}"
+      - "--api.insecure={{ traefik_api_insecure }}"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.traefik.acme.tlschallenge=true"
+      - "--certificatesresolvers.traefik.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.traefik.acme.email={{ traefik_acme_email }}"
+      - "--certificatesresolvers.traefik.acme.storage=/var/traefik/acme.json"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.auth.basicauth.users={{ traefik_dashboard_basicauth_passwords | join(',') }}"
+      - "traefik.http.middlewares.test-redirectscheme.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.routers.dashboard.rule=Host(`{{ traefik_domain }}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=traefik"
+      - "traefik.http.routers.dashboard.tls.domains[0].main={{ traefik_domain }}"
+    networks:
+      - "{{ network }}"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ traefik_acme_dir }}:/etc/traefik/acme"
+      - "{{ traefik_log_dir }}:/var/log/traefik"
