@@ -9,7 +9,7 @@ services:
     container_name: "{{ traefik_container_name }}"
     image: "{{ traefik_image }}"
     command:
-      - "--log.level={{ trafik_log_level }}"
+      - "--log.level={{ traefik_log_level }}"
       - "--api.insecure={{ traefik_api_insecure }}"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
