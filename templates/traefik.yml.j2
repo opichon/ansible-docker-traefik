@@ -15,7 +15,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.traefik.acme.tlschallenge=true"
-      - "--certificatesresolvers.traefik.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.traefik.acme.caserver={{ traefik_acme_caserver }}"
       - "--certificatesresolvers.traefik.acme.email={{ traefik_acme_email }}"
       - "--certificatesresolvers.traefik.acme.storage=/var/traefik/acme.json"
     labels:
