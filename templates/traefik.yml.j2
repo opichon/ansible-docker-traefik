@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.dashboard.tls.certresolver=traefik"
       - "traefik.http.routers.dashboard.tls.domains[0].main={{ traefik_domain }}"
     networks:
-      - "{{ network }}"
+      - "{{ traefik_network }}"
     ports:
       - "443:443"
       - "8080:8080"
