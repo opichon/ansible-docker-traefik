@@ -6,7 +6,7 @@ networks:
     
 services:
   traefik:
-    container_name: "{{ traefik_contaioner_name }}"
+    container_name: "{{ traefik_container_name }}"
     image: "{{ traefik_image }}"
     command:
       - "--log.level={{ trafik_log_level }}"
