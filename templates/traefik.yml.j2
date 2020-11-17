@@ -9,8 +9,9 @@ services:
     container_name: "{{ traefik_container_name }}"
     image: "{{ traefik_image }}"
     command:
-      - "--log.level={{ traefik_log_level }}"
       - "--api.insecure={{ traefik_api_insecure }}"
+      - "--log.filePath=/var/logs/traefik/traefik.log"
+      - "--log.level={{ traefik_log_level }}"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.websecure.address=:443"
@@ -39,4 +40,4 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ traefik_acme_dir }}:/etc/traefik/acme"
-      - "{{ traefik_log_dir }}:/var/log/traefik"
+      - "{{ traefik_log_dir }}:/var/logs/traefik"
