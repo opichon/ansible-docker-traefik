@@ -19,6 +19,7 @@
     group: "{{ traefik_group }}"
     owner: "{{ traefik_user }}"
     src: "templates/traefik.yml.j2"
+  when: traefik_state == "started"
 
 - name: Start traefik
   command: docker-compose -f traefik.yml up -d
