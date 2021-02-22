@@ -39,5 +39,5 @@ services:
     restart: unless-stopped
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ traefik_acme_dir }}:/etc/traefik/acme"
+      - "{{ traefik_acme_dir }}:/var/traefik/acme"
       - "{{ traefik_log_dir }}:/var/logs/traefik"
