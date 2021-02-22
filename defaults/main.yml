@@ -9,7 +9,7 @@ traefik_debug: false
 traefik_dir: /etc/traefik
 traefik_domain: ""
 traefik_group: www-data
-traefik_image: "traefik:v2.3"
+traefik_image: "traefik:v2.4"
 traefik_log_dir: "{{ traefik_dir }}/logs"
 traefik_log_level: ERROR
 traefik_network: traefik
