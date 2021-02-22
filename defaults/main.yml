@@ -4,6 +4,7 @@ traefik_acme_email: ""
 traefik_acme_staging: false
 traefik_api_insecure: false
 traefik_container_name: traefik
+traefik_dashboard: true
 traefik_dashboard_basicauth_passwords: []
 traefik_debug: false
 traefik_dir: /etc/traefik
