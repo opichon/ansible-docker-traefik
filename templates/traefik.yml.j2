@@ -18,7 +18,7 @@ services:
       - "--certificatesresolvers.traefik.acme.tlschallenge=true"
       - "--certificatesresolvers.traefik.acme.caserver={{ traefik_acme_caserver }}"
       - "--certificatesresolvers.traefik.acme.email={{ traefik_acme_email }}"
-      - "--certificatesresolvers.traefik.acme.storage=/var/traefik/acme.json"
+      - "--certificatesresolvers.traefik.acme.storage=/etc/traefik/acme.json"
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.auth.basicauth.users={{ traefik_dashboard_basicauth_passwords | join(',') }}"
@@ -39,5 +39,5 @@ services:
     restart: unless-stopped
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ traefik_acme_dir }}:/var/traefik/acme"
+      - "{{ traefik_acme_dir }}:/etc/traefik"
       - "{{ traefik_log_dir }}:/var/logs/traefik"
