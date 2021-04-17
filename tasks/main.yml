@@ -41,7 +41,7 @@
     create: true
 
 - name: Start traefik
-  command: docker stack deploy -f traefik.yml traefik
+  command: docker stack deploy -c traefik.yml traefik
   args:
     chdir: "{{ deploy_dir }}"
   when: state == "started"
