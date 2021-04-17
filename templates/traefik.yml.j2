@@ -19,7 +19,7 @@ services:
       - "--providers.docker.exposedByDefault={{ expose_by_default }}"
       - "--providers.docker.network={{ network }}"
       - "--providers.docker.swarmMode=true"
-      - "--providers.docker.swarmModeRefreshSeconds={{ refresh }}
+      - "--providers.docker.swarmModeRefreshSeconds={{ refresh }}"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
