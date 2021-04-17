@@ -41,13 +41,13 @@
     create: true
 
 - name: Start traefik
-  command: docker-compose -f traefik.yml up -d
+  command: docker stack deploy -f traefik.yml traefik
   args:
     chdir: "{{ deploy_dir }}"
   when: state == "started"
 
 - name: Stop traefik
-  command: docker-compose -f traefik.yml down
+  command: docker stack rm traefik
   args:
     chdir: "{{ deploy_dir }}"
   when: state == "stopped"
