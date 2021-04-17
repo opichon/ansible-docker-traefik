@@ -1,19 +1,31 @@
-traefik_acme_caserver: "https://acme-v02.api.letsencrypt.org/directory"
-traefik_acme_dir: "{{ traefik_dir }}/acme"
-traefik_acme_email: ""
-traefik_acme_staging: false
-traefik_api_insecure: false
-traefik_container_name: traefik
-traefik_dashboard: true
-traefik_dashboard_basicauth_passwords: []
-traefik_debug: false
-traefik_dir: /etc/traefik
-traefik_domain: ""
-traefik_group: www-data
-traefik_image: "traefik:v2.4"
-traefik_log_dir: "{{ traefik_dir }}/logs"
-traefik_log_format: "common"
-traefik_log_level: ERROR
-traefik_network: traefik
-traefik_state: started
-traefik_user: www-data
+access_log_format: common
+acme_caserver: "https://acme-v02.api.letsencrypt.org/directory"
+acme_dir: "{{ traefik_dir }}/acme"
+acme_email: ""
+acme_staging: false
+api_insecure: false
+
+container_name: traefik
+
+dashboard: true
+dashboard_basicauth_passwords: []
+debug: false
+deploy_dir: /etc/traefik
+deploy_group: www-data
+deploy_user: www-data
+domain: ""
+
+expose_by_default: false
+
+image: "traefik:v2.4"
+
+label: traefik
+log_dir: "/var/log/traefik"
+log_format: "common"
+log_level: ERROR
+
+network: traefik
+
+refresh: 15
+
+state: started

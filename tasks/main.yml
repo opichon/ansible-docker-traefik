@@ -2,31 +2,30 @@
 - name: Ensure traefik data directory exist
   become: true
   file:
-    group: "{{ traefik_group }}"
-    owner: "{{ traefik_user }}"
+    group: "{{ deploy_group }}"
+    owner: "{{ deploy_user }}"
     path: "{{ item }}"
     state: directory
     recurse: yes
   with_items:
-    - "{{ traefik_dir }}"
-    - "{{ traefik_acme_dir }}"
-    - "{{ traefik_log_dir }}"
+    - "{{ deploy_dir }}"
+    - "{{ log_dir }}"
 
 - name: Copy files
   become: true
   template:
-    dest: "{{ traefik_dir }}/traefik.yml"
-    group: "{{ traefik_group }}"
-    owner: "{{ traefik_user }}"
+    dest: "{{ deploy_dir }}/traefik.yml"
+    group: "{{ deploy_group }}"
+    owner: "{{ deploy_user }}"
     src: "templates/traefik.yml.j2"
-  when: traefik_state == "started"
+  when: state == "started"
 
 - name: Setup logrotate
   become: true
   blockinfile:
     path: "/etc/logrotate.d/traefik"
     block: |
-      /{{ traefik_log_dir }}/traefik/*.log {
+      /{{ log_dir }}/*.log {
         compress
         create
         daily
@@ -35,7 +34,7 @@
         missingok
         notifempty
         postrotate
-          docker kill --signal="USR1" {{ traefik_container_name }}
+          docker kill --signal="USR1" {{ container_name }}
         endscript
         rotate 5
       } 
@@ -44,11 +43,11 @@
 - name: Start traefik
   command: docker-compose -f traefik.yml up -d
   args:
-    chdir: "{{ traefik_dir }}"
-  when: traefik_state == "started"
+    chdir: "{{ deploy_dir }}"
+  when: deploy_state == "started"
 
 - name: Stop traefik
   command: docker-compose -f traefik.yml down
   args:
-    chdir: "{{ traefik_dir }}"
-  when: traefik_state == "stopped"
+    chdir: "{{ deploy_dir }}"
+  when: state == "stopped"

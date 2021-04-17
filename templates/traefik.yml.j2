@@ -1,47 +1,63 @@
 version: "3.7"
 
 networks:
-  {{ traefik_network }}:
+  {{ network }}:
     external: true
     
 services:
   traefik:
-    container_name: "{{ traefik_container_name }}"
-    image: "{{ traefik_image }}"
+    container_name: "{{ container_name }}"
+    image: "{{ image }}"
     command:
-      - "--api.dashboard={{ traefik_dashboard }}"
+      - "--accesslog=true"
+      - "--accesslog.filePath=/var/logs/traefik/access.log"
+      - "--accesslog.format={{ access_log_format }}"
+      - "--api.dashboard={{ dashboard }}"
       - "--log.filePath=/var/logs/traefik/traefik.log"
-      - "--log.format={{ traefik_log_format }}"
-      - "--log.level={{ traefik_log_level }}"
-      - "--providers.docker=true"
+      - "--log.format={{ log_format }}"
+      - "--log.level={{ log_level }}"
+      - "--providers.docker.exposedByDefault={{ expose_by_default }}"
+      - "--providers.docker.network={{ network }}"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.swarmModeRefreshSeconds={{ refresh }}
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.traefik.acme.tlschallenge=true"
-      - "--certificatesresolvers.traefik.acme.caserver={{ traefik_acme_caserver }}"
-      - "--certificatesresolvers.traefik.acme.email={{ traefik_acme_email }}"
-      - "--certificatesresolvers.traefik.acme.storage=/etc/traefik/acme.json"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.middlewares.auth.basicauth.users={{ traefik_dashboard_basicauth_passwords | join(',') }}"
-      - "traefik.http.middlewares.test-redirectscheme.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.routers.dashboard.rule=Host(`{{ traefik_domain }}`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=traefik"
-      - "traefik.http.routers.dashboard.tls.domains[0].main={{ traefik_domain }}"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.caserver={{ acme_caserver }}"
+      - "--certificatesresolvers.le.acme.email={{ acme_email }}"
+      - "--certificatesresolvers.le.acme.storage=/etc/traefik/acme.json"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.{{ label }} == true
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.middlewares.auth.basicauth.users={{ dashboard_basicauth_passwords | join(',') }}"
+        - "traefik.http.middlewares.test-redirectscheme.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
+        - "traefik.http.routers.dashboard.entrypoints=websecure"
+        - "traefik.http.routers.dashboard.middlewares=auth"
+        - "traefik.http.routers.dashboard.rule=Host(`{{ domain }}`)"
+        - "traefik.http.routers.dashboard.service=api@internal"
+        - "traefik.http.routers.dashboard.tls=true"
+        - "traefik.http.routers.dashboard.tls.certresolver=le"
+        - "traefik.http.routers.dashboard.tls.domains[0].main={{ domain }}"
+        - "traefik.http.services.dashboard.loadbalancer.server.port=8080
+      restart-policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     networks:
-      - "{{ traefik_network }}"
+      - "{{ network }}"
     ports:
       - "80:80"
       - "443:443"
-    restart: unless-stopped
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
-      - "{{ traefik_log_dir }}:/var/logs/traefik"
+      - "{{ deploy_dir }}/acme.json:/etc/traefik/acme.json"
+      - "{{ log_dir }}:/var/logs/traefik"
