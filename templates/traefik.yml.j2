@@ -11,6 +11,7 @@ services:
     command:
       - "--api.dashboard={{ traefik_dashboard }}"
       - "--log.filePath=/var/logs/traefik/traefik.log"
+      - "--log.format={{ traefik_log_format }}"
       - "--log.level={{ traefik_log_level }}"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -42,5 +43,5 @@ services:
     restart: unless-stopped
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ traefik_acme_dir }}:/etc/traefik"
+      - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
       - "{{ traefik_log_dir }}:/var/logs/traefik"
