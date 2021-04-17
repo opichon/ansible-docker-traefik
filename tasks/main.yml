@@ -44,7 +44,7 @@
   command: docker-compose -f traefik.yml up -d
   args:
     chdir: "{{ deploy_dir }}"
-  when: deploy_state == "started"
+  when: state == "started"
 
 - name: Stop traefik
   command: docker-compose -f traefik.yml down
