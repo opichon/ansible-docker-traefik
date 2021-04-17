@@ -21,6 +21,26 @@
     src: "templates/traefik.yml.j2"
   when: traefik_state == "started"
 
+- name: Setup logrotate
+  become: true
+  blockinfile:
+    path: "/etc/logrotate.d/traefik"
+    block: |
+      /{{ traefik_log_dir }}/traefik/*.log {
+        compress
+        create
+        daily
+        dateext
+        dateformat -%Y%m%d
+        missingok
+        notifempty
+        postrotate
+          docker kill --signal="USR1" {{ traefik_container_name }}
+        endscript
+        rotate 5
+      } 
+    create: true
+
 - name: Start traefik
   command: docker-compose -f traefik.yml up -d
   args:
