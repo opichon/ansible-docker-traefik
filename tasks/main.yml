@@ -20,6 +20,16 @@
     src: "templates/traefik.yml.j2"
   when: state == "started"
 
+- name: Set acme.json permissions
+  become: true
+  file:
+    group: "{{ deploy_group }}"
+    mode: 600
+    owner: "{{ deploy_user }}"a
+    path: "{{ deploy_dir }}/acme.json"
+    state: touch
+  when: state == "started"
+
 - name: Setup logrotate
   become: true
   blockinfile:
