@@ -12,6 +12,7 @@ traefik_domain: ""
 traefik_group: www-data
 traefik_image: "traefik:v2.4"
 traefik_log_dir: "{{ traefik_dir }}/logs"
+traefik_log_format: "common"
 traefik_log_level: ERROR
 traefik_network: traefik
 traefik_state: started
