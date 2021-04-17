@@ -32,7 +32,7 @@ services:
     deploy:
       placement:
         constraints:
-          - "node.labels.{{ label }} == true
+          - "node.labels.{{ label }} == true"
           - node.role == manager
       labels:
         - "traefik.enable=true"
@@ -46,7 +46,7 @@ services:
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=le"
         - "traefik.http.routers.dashboard.tls.domains[0].main={{ domain }}"
-        - "traefik.http.services.dashboard.loadbalancer.server.port=8080
+        - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
       restart-policy:
         condition: on-failure
         delay: 5s
