@@ -64,4 +64,4 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ deploy_dir }}/acme.json:/etc/traefik/acme.json"
-      - "{{ log_dir }}:/var/logs/traefik"
+      - "{{ log_dir }}:/var/log/traefik"
