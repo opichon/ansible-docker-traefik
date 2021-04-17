@@ -62,6 +62,9 @@ services:
         published: 443
         mode: ingress
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ deploy_dir }}/acme.json:/etc/traefik/acme.json"
+      - acme:/etc/traefik
       - "{{ log_dir }}:/var/log/traefik"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  acme:
