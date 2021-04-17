@@ -9,7 +9,6 @@ galaxy_info:
   min_ansible_version: 1.2
 
   platforms:
-
   - name: Ubuntu
     versions:
     - all
@@ -18,6 +17,7 @@ galaxy_info:
     - all
 
   galaxy_tags:
-    - apt
+    - docker
+    - traefik
 
 dependencies: []
