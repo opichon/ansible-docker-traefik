@@ -35,18 +35,25 @@ services:
           - "node.labels.{{ label }} == true"
           - node.role == manager
       labels:
+        - "traefik.docker.network={{ network }}"
         - "traefik.enable=true"
         - "traefik.http.middlewares.auth.basicauth.users={{ dashboard_basicauth_passwords | join(',') }}"
-        - "traefik.http.middlewares.test-redirectscheme.redirectscheme.scheme=https"
-        - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
-        - "traefik.http.routers.dashboard.entrypoints=websecure"
-        - "traefik.http.routers.dashboard.middlewares=auth"
-        - "traefik.http.routers.dashboard.rule=Host(`{{ domain }}`)"
-        - "traefik.http.routers.dashboard.service=api@internal"
-        - "traefik.http.routers.dashboard.tls=true"
-        - "traefik.http.routers.dashboard.tls.certresolver=le"
-        - "traefik.http.routers.dashboard.tls.domains[0].main={{ domain }}"
-        - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+
+        - "traefik.http.routers.traefik-http.entrypoints=web"
+        - "traefik.http.routers.traefik-http.middlewares=https-redirect"
+        - "traefik.http.routers.traefik-http.rule=Host(`{{ domain }}`)"
+
+
+        - "traefik.http.routers.traefik-https.entrypoints=websecure"
+        - "traefik.http.routers.traefik-https.middlewares=auth"
+        - "traefik.http.routers.traefik-https.rule=Host(`{{ domain }}`)"
+        - "traefik.http.routers.traefik-https.service=api@internal"
+        - "traefik.http.routers.traefik-https.tls=true"
+        - "traefik.http.routers.traefik-https.tls.certresolver=le"
+        - "traefik.http.routers.traefik-https.tls.domains[0].main={{ domain }}"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
       restart_policy:
         condition: on-failure
         delay: 5s
