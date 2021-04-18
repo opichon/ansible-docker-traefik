@@ -24,6 +24,8 @@ acme_domains:
   - domain: mydomain.com
     sans:
       - www.mydomain.com
+acme_logging: true
+acme_staging: false
 ```
 
 ## Example playbook
@@ -32,7 +34,7 @@ acme_domains:
 ---
 - hosts: webservers
   roles:
-    - opichon.docker-traefik
+    - dzangolab.docker_traefik
       traefik_certificates:
       -
       	{

@@ -1,0 +1,77 @@
+version: "3.7"
+
+networks:
+  {{ network }}:
+    external: true
+    
+services:
+  traefik:
+    container_name: "{{ container_name }}"
+    image: "{{ image }}"
+    command:
+      - "--accesslog=true"
+      - "--accesslog.filePath=/var/logs/traefik/access.log"
+      - "--accesslog.format={{ access_log_format }}"
+      - "--api.dashboard={{ dashboard }}"
+      - "--log.filePath=/var/logs/traefik/traefik.log"
+      - "--log.format={{ log_format }}"
+      - "--log.level={{ log_level }}"
+      - "--providers.docker.exposedByDefault={{ expose_by_default }}"
+      - "--providers.docker.network={{ network }}"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.swarmModeRefreshSeconds={{ refresh }}"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.caserver={{ acme_caserver }}"
+      - "--certificatesresolvers.le.acme.email={{ acme_email }}"
+      - "--certificatesresolvers.le.acme.storage=/etc/traefik/acme.json"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.{{ label }} == true"
+          - node.role == manager
+      labels:
+        - "traefik.docker.network={{ network }}"
+        - "traefik.enable=true"
+        - "traefik.http.middlewares.auth.basicauth.users={{ dashboard_basicauth_passwords | join(',') }}"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+
+        - "traefik.http.routers.traefik-http.entrypoints=web"
+        - "traefik.http.routers.traefik-http.middlewares=https-redirect"
+        - "traefik.http.routers.traefik-http.rule=Host(`{{ domain }}`)"
+
+
+        - "traefik.http.routers.traefik-https.entrypoints=websecure"
+        - "traefik.http.routers.traefik-https.middlewares=auth"
+        - "traefik.http.routers.traefik-https.rule=Host(`{{ domain }}`)"
+        - "traefik.http.routers.traefik-https.service=api@internal"
+        - "traefik.http.routers.traefik-https.tls=true"
+        - "traefik.http.routers.traefik-https.tls.certresolver=le"
+        - "traefik.http.routers.traefik-https.tls.domains[0].main={{ domain }}"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - "{{ network }}"
+    ports:
+      - target: 80
+        published: 80
+        mode: ingress
+      - target: 443
+        published: 443
+        mode: ingress
+    volumes:
+      - acme:/etc/traefik
+      - "{{ log_dir }}:/var/log/traefik"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  acme:

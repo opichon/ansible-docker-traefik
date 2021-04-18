@@ -1,48 +1,63 @@
 ---
-- name: Make sure that the traefik directory exists
+- name: Ensure traefik data directory exist
   become: true
   file:
-    group: "{{ traefik_group }}"
-    owner: "{{ traefik_user }}"
-    path: "{{ traefik_dir }}"
+    group: "{{ deploy_group }}"
+    owner: "{{ deploy_user }}"
+    path: "{{ item }}"
     state: directory
-    mode: "0744"
+    recurse: yes
+  with_items:
+    - "{{ deploy_dir }}"
+    - "{{ log_dir }}"
 
-- name: Copy traefik config
+- name: Copy files
+  become: true
   template:
-    dest: "{{ traefik_dir }}/traefik.toml"
-    force: true
-    src: templates/traefik.toml.j2
+    dest: "{{ deploy_dir }}/traefik.yml"
+    group: "{{ deploy_group }}"
+    owner: "{{ deploy_user }}"
+    src: "templates/traefik.yml.j2"
+  when: state == "started"
 
-- name: Copy acme.json
-  copy:
-    dest: "{{ traefik_dir }}/acme.json"
-    force: false
-    mode: 0600
-    src: files/acme.json
+- name: Set acme.json permissions
+  become: true
+  file:
+    group: "{{ deploy_group }}"
+    mode: 600
+    owner: "{{ deploy_user }}"
+    path: "{{ deploy_dir }}/acme.json"
+    state: touch
+  when: state == "started"
 
-- name: Run traefik proxy
-  docker_container:
-    image: "{{ traefik_image }}"
-    labels:
-      traefik.backend: traefik
-      traefik.frontend.rule: "Host:{{ traefik_hostname }}"
-      traefik.port: "8080"
-    name: traefik
-    pull: true
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    recreate: true
-    restart_policy: always
-    state: "{{ traefik_state }}"
-    volumes: '[ "/var/run/docker.sock:/var/run/docker.sock", "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml", "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json" ] + {{ traefik_volumes }}'
+- name: Setup logrotate
+  become: true
+  blockinfile:
+    path: "/etc/logrotate.d/traefik"
+    block: |
+      /{{ log_dir }}/*.log {
+        compress
+        create
+        daily
+        dateext
+        dateformat -%Y%m%d
+        missingok
+        notifempty
+        postrotate
+          docker kill --signal="USR1" {{ container_name }}
+        endscript
+        rotate 5
+      } 
+    create: true
 
-- name: Create network
-  docker_network:
-    driver: bridge
-    name: "{{ item }}"
-    connected: traefik
-  with_items: "{{ traefik_networks }}"
-  ignore_errors: yes
+- name: Start traefik
+  command: docker stack deploy -c traefik.yml traefik
+  args:
+    chdir: "{{ deploy_dir }}"
+  when: state == "started"
+
+- name: Stop traefik
+  command: docker stack rm traefik
+  args:
+    chdir: "{{ deploy_dir }}"
+  when: state == "stopped"
